@@ -3,19 +3,18 @@ package texture_manager
 import (
 	"path"
 
+	"go_client/constants"
 	"go_client/texture_manager/tm_errors"
 
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/sdl_image"
 )
 
-const (
-	TEXTURES_PATH = "../../textures"
-)
-
 var (
 	_TEXTURES = [][]string{
 		{"Board", "Board.png"},
+		{"Corner_top", "Corner_top.png"},
+		{"Corner_bottom", "Corner_bottom.png"},
 	}
 )
 
@@ -43,7 +42,7 @@ func (t *TextureManager) Initialize(renderer *sdl.Renderer) error {
 }
 
 func (t *TextureManager) load_file(name string, path_file string) error {
-	full_path := path.Join(TEXTURES_PATH, path_file)
+	full_path := path.Join(constants.BASE_DIR, "textures", path_file)
 	f := sdl.RWFromFile(full_path, "rb")
 	s, err := img.LoadPNG_RW(f)
 	if err != nil {
