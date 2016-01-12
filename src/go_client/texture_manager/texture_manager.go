@@ -1,6 +1,7 @@
 package texture_manager
 
 import (
+	"go_client/point"
 	"path"
 
 	"go_client/constants"
@@ -66,6 +67,10 @@ func (t *TextureManager) Draw(name string, x int32, y int32) {
 	texture := t.Get(name)
 	_, _, width, height, _ := texture.Query()
 	t.renderer.Copy(texture, nil, &sdl.Rect{x, y, width, height})
+}
+
+func (t *TextureManager) DrawPoint(name string, p *point.Point) {
+	t.Draw(name, int32(p.X), int32(p.Y))
 }
 
 func (t *TextureManager) Close() {

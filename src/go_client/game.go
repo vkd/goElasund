@@ -7,6 +7,7 @@ import (
 	"time"
 
 	font_helper "go_client/font"
+	"go_client/point"
 	"go_client/texture_manager"
 
 	"github.com/veandco/go-sdl2/sdl"
@@ -82,7 +83,7 @@ func Run() {
 		fps_now := int64(time.Second) / ns
 		t = time.Now()
 
-		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &Point{25, 5}, WHITE, 16)
+		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &point.Point{25, 5}, WHITE, 16)
 
 		for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch t := event.(type) {
@@ -105,14 +106,17 @@ func Run() {
 			}
 		}
 
-		draw_text(fmt.Sprintf("Mouse: (%d:%d)", mouseX, mouseY), &Point{725, 20}, WHITE, 16)
-		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &Point{25, 5}, BLACK, 16)
+		draw_text(fmt.Sprintf("Mouse: (%d:%d)", mouseX, mouseY), &point.Point{725, 20}, WHITE, 16)
+		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &point.Point{25, 5}, BLACK, 16)
 
 		for i := 0; i < 10; i++ {
 			for j := -1; j < 11; j++ {
 				draw_text(fmt.Sprintf("(%d, %d)", i, j), get_point(i, j).Move(8, 10), BLUE, 12)
 			}
 		}
+
+		tm.DrawPoint("Corner_top", get_point(4, -1))
+		tm.DrawPoint("Corner_bottom", get_point(4, 9))
 
 		if mouse_clicked {
 			tm.Draw("Corner_top", mouseX, mouseY)
@@ -128,7 +132,7 @@ func Run() {
 	sdl.Quit()
 }
 
-func draw_text(text string, pos *Point, color sdl.Color, size int) {
+func draw_text(text string, pos *point.Point, color sdl.Color, size int) {
 	surf, err := font.Size(size).RenderUTF8_Blended(text, color)
 	if err != nil {
 		panic(err)
@@ -145,10 +149,10 @@ func draw_text(text string, pos *Point, color sdl.Color, size int) {
 	}
 }
 
-func get_point(x int, y int) *Point {
+func get_point(x int, y int) *point.Point {
 	step := 50
 	border := 1
 	// X := 153 + x*(step+border)
 	// Y := 184 + y*(step+border)
-	return &Point{153 + x*(step+border), 184 + y*(step+border)}
+	return &point.Point{153 + x*(step+border), 184 + y*(step+border)}
 }

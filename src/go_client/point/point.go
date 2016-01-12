@@ -1,4 +1,4 @@
-package go_client
+package point
 
 type Point struct {
 	X, Y int
