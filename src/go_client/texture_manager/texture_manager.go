@@ -44,10 +44,12 @@ func (t *TextureManager) Initialize(renderer *sdl.Renderer) error {
 func (t *TextureManager) load_file(name string, path_file string) error {
 	full_path := path.Join(constants.BASE_DIR, "textures", path_file)
 	f := sdl.RWFromFile(full_path, "rb")
+	defer f.RWclose()
 	s, err := img.LoadPNG_RW(f)
 	if err != nil {
 		return &tm_errors.LoadTextureError{full_path, err}
 	}
+	defer s.Free()
 	texture, err := t.renderer.CreateTextureFromSurface(s)
 	if err != nil {
 		return &tm_errors.CreateTextureError{name, err}
@@ -64,4 +66,10 @@ func (t *TextureManager) Draw(name string, x int32, y int32) {
 	texture := t.Get(name)
 	_, _, width, height, _ := texture.Query()
 	t.renderer.Copy(texture, nil, &sdl.Rect{x, y, width, height})
+}
+
+func (t *TextureManager) Close() {
+	for _, v := range t.textures {
+		v.Destroy()
+	}
 }

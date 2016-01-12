@@ -124,6 +124,7 @@ func Run() {
 			break
 		}
 	}
+	tm.Close()
 	sdl.Quit()
 }
 
@@ -132,10 +133,12 @@ func draw_text(text string, pos *Point, color sdl.Color, size int) {
 	if err != nil {
 		panic(err)
 	}
+	defer surf.Free()
 	text_texture, err := renderer.CreateTextureFromSurface(surf)
 	if err != nil {
 		panic(err)
 	}
+	defer text_texture.Destroy()
 	err = renderer.Copy(text_texture, nil, &sdl.Rect{int32(pos.X), int32(pos.Y), surf.W, surf.H})
 	if err != nil {
 		panic(err)
