@@ -8,7 +8,7 @@ import (
 
 	font_helper "go_client/font"
 	"go_client/point"
-	"go_client/texture_manager"
+	tm "go_client/texture_manager"
 
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/sdl_ttf"
@@ -54,8 +54,8 @@ func Run() {
 	}
 	defer renderer.Destroy()
 
-	tm := texture_manager.TextureManager{}
-	err = tm.Initialize(renderer)
+	t := tm.TextureManager{}
+	err = t.Initialize(renderer)
 	if err != nil {
 		panic(err)
 	}
@@ -68,45 +68,46 @@ func Run() {
 
 	var event sdl.Event
 	var is_running = true
-	var t time.Time
+	var time_fps time.Time
 
-	var mouseX, mouseY int32
+	var mouse_point *point.Point = &point.Point{0, 0}
 	var mouse_clicked bool
+
+	count_players := 4
 
 	for _ = range time.Tick(DELTA_FPS) {
 		renderer.SetDrawColor(100, 10, 100, 255)
 		renderer.Clear()
 
-		tm.Draw("Board", 0, 0)
+		t.Common[tm.Common_Board].Draw(0, 0)
 
-		ns := time.Since(t).Nanoseconds()
+		ns := time.Since(time_fps).Nanoseconds()
 		fps_now := int64(time.Second) / ns
-		t = time.Now()
+		time_fps = time.Now()
 
 		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &point.Point{25, 5}, WHITE, 16)
 
 		for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch t := event.(type) {
+			switch e := event.(type) {
 			case *sdl.QuitEvent:
 				is_running = false
 			case *sdl.MouseButtonEvent:
-				if t.Button == sdl.BUTTON_LEFT && t.State == sdl.PRESSED {
+				if e.Button == sdl.BUTTON_LEFT && e.State == sdl.PRESSED {
 					mouse_clicked = !mouse_clicked
 				}
 			case *sdl.MouseMotionEvent:
-				mouseX = t.X
-				mouseY = t.Y
+				mouse_point = &point.Point{int(e.X), int(e.Y)}
 			case *sdl.KeyDownEvent:
-				if t.Keysym.Sym == sdl.K_ESCAPE {
+				if e.Keysym.Sym == sdl.K_ESCAPE {
 					is_running = false
 				}
-				if t.Keysym.Sym == sdl.K_q {
+				if e.Keysym.Sym == sdl.K_q {
 					is_running = false
 				}
 			}
 		}
 
-		draw_text(fmt.Sprintf("Mouse: (%d:%d)", mouseX, mouseY), &point.Point{725, 20}, WHITE, 16)
+		draw_text(fmt.Sprintf("Mouse: (%d:%d)", mouse_point.X, mouse_point.Y), &point.Point{725, 20}, WHITE, 16)
 		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &point.Point{25, 5}, BLACK, 16)
 
 		for i := 0; i < 10; i++ {
@@ -115,11 +116,11 @@ func Run() {
 			}
 		}
 
-		tm.DrawPoint("Corner_top", get_point(4, -1))
-		tm.DrawPoint("Corner_bottom", get_point(4, 9))
+		t.Common[tm.Common_CornerTop].DrawPoint(get_point(count_players*2, -1))
+		t.Common[tm.Common_CornerBottom].DrawPoint(get_point(count_players*2, 9))
 
 		if mouse_clicked {
-			tm.Draw("Corner_top", mouseX, mouseY)
+			t.Common[tm.Common_CornerTop].DrawPoint(mouse_point)
 		}
 
 		renderer.Present()
@@ -128,7 +129,7 @@ func Run() {
 			break
 		}
 	}
-	tm.Close()
+	t.Close()
 	sdl.Quit()
 }
 

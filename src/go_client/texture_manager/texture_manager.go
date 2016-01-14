@@ -1,7 +1,6 @@
 package texture_manager
 
 import (
-	"go_client/point"
 	"path"
 
 	"go_client/constants"
@@ -11,28 +10,26 @@ import (
 	"github.com/veandco/go-sdl2/sdl_image"
 )
 
-var (
-	_TEXTURES = [][]string{
-		{"Board", "Board.png"},
-		{"Corner_top", "Corner_top.png"},
-		{"Corner_bottom", "Corner_bottom.png"},
-	}
-)
-
 type TextureManager struct {
 	is_initialized bool
 	renderer       *sdl.Renderer
 
-	textures map[string]*sdl.Texture
+	Common map[int]*Texture
 }
 
 func (t *TextureManager) Initialize(renderer *sdl.Renderer) error {
 	t.renderer = renderer
-	t.textures = make(map[string]*sdl.Texture)
+	t.Common = make(map[int]*Texture)
 
+	t.Common[Common_Board] = &Texture{Path: "Board.png"}
+	t.Common[Common_ChurchBack] = &Texture{Path: "Church0.png"}
+	t.Common[Common_CornerBottom] = &Texture{Path: "Corner_bottom.png"}
+	t.Common[Common_CornerTop] = &Texture{Path: "Corner_top.png"}
+
+	var tex *Texture
 	var err error
-	for _, texture_config := range _TEXTURES {
-		err = t.load_file(texture_config[0], texture_config[1])
+	for _, tex = range t.Common {
+		err = tex.Init(renderer)
 		if err != nil {
 			return err
 		}
@@ -42,39 +39,24 @@ func (t *TextureManager) Initialize(renderer *sdl.Renderer) error {
 	return nil
 }
 
-func (t *TextureManager) load_file(name string, path_file string) error {
+func (t *TextureManager) load_file(path_file string) (*sdl.Texture, error) {
 	full_path := path.Join(constants.BASE_DIR, "textures", path_file)
 	f := sdl.RWFromFile(full_path, "rb")
 	defer f.RWclose()
 	s, err := img.LoadPNG_RW(f)
 	if err != nil {
-		return &tm_errors.LoadTextureError{full_path, err}
+		return nil, &tm_errors.LoadTextureError{full_path, err}
 	}
 	defer s.Free()
 	texture, err := t.renderer.CreateTextureFromSurface(s)
 	if err != nil {
-		return &tm_errors.CreateTextureError{name, err}
+		return nil, &tm_errors.CreateTextureError{path_file, err}
 	}
-	t.textures[name] = texture
-	return nil
-}
-
-func (t *TextureManager) Get(name string) *sdl.Texture {
-	return t.textures[name]
-}
-
-func (t *TextureManager) Draw(name string, x int32, y int32) {
-	texture := t.Get(name)
-	_, _, width, height, _ := texture.Query()
-	t.renderer.Copy(texture, nil, &sdl.Rect{x, y, width, height})
-}
-
-func (t *TextureManager) DrawPoint(name string, p *point.Point) {
-	t.Draw(name, int32(p.X), int32(p.Y))
+	return texture, nil
 }
 
 func (t *TextureManager) Close() {
-	for _, v := range t.textures {
+	for _, v := range t.Common {
 		v.Destroy()
 	}
 }
