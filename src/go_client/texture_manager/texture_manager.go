@@ -10,21 +10,36 @@ import (
 	"github.com/veandco/go-sdl2/sdl_image"
 )
 
+var (
+	common_textures = []*struct {
+		T Common_TextureType
+		S string
+	}{
+		{Common_Board, "Board.png"},
+		{Common_ChurchBack, "Church0.png"},
+		{Common_CornerBottom, "Corner_bottom.png"},
+		{Common_CornerTop, "Corner_top.png"},
+
+		{Common_Hotel, "Buildings/Hotel.png"},
+	}
+)
+
 type TextureManager struct {
 	is_initialized bool
 	renderer       *sdl.Renderer
 
-	Common map[int]*Texture
+	Common map[Common_TextureType]*Texture
+
+	Icon *sdl.Surface
 }
 
 func (t *TextureManager) Initialize(renderer *sdl.Renderer) error {
 	t.renderer = renderer
-	t.Common = make(map[int]*Texture)
+	t.Common = make(map[Common_TextureType]*Texture)
 
-	t.Common[Common_Board] = &Texture{Path: "Board.png"}
-	t.Common[Common_ChurchBack] = &Texture{Path: "Church0.png"}
-	t.Common[Common_CornerBottom] = &Texture{Path: "Corner_bottom.png"}
-	t.Common[Common_CornerTop] = &Texture{Path: "Corner_top.png"}
+	for _, v := range common_textures {
+		t.Common[v.T] = &Texture{Path: v.S}
+	}
 
 	var tex *Texture
 	var err error
@@ -35,17 +50,19 @@ func (t *TextureManager) Initialize(renderer *sdl.Renderer) error {
 		}
 	}
 
+	t.Icon, err = t.load_file_as_surface("icon.png")
+	if err != nil {
+		return err
+	}
+
 	t.is_initialized = true
 	return nil
 }
 
 func (t *TextureManager) load_file(path_file string) (*sdl.Texture, error) {
-	full_path := path.Join(constants.BASE_DIR, "textures", path_file)
-	f := sdl.RWFromFile(full_path, "rb")
-	defer f.RWclose()
-	s, err := img.LoadPNG_RW(f)
+	s, err := t.load_file_as_surface(path_file)
 	if err != nil {
-		return nil, &tm_errors.LoadTextureError{full_path, err}
+		return nil, &tm_errors.LoadTextureError{path_file, err}
 	}
 	defer s.Free()
 	texture, err := t.renderer.CreateTextureFromSurface(s)
@@ -55,8 +72,20 @@ func (t *TextureManager) load_file(path_file string) (*sdl.Texture, error) {
 	return texture, nil
 }
 
+func (t *TextureManager) load_file_as_surface(path_file string) (*sdl.Surface, error) {
+	full_path := path.Join(constants.BASE_DIR, "textures", path_file)
+	f := sdl.RWFromFile(full_path, "rb")
+	defer f.RWclose()
+	s, err := img.LoadPNG_RW(f)
+	if err != nil {
+		return nil, &tm_errors.LoadTextureError{full_path, err}
+	}
+	return s, nil
+}
+
 func (t *TextureManager) Close() {
 	for _, v := range t.Common {
 		v.Destroy()
 	}
+	t.Icon.Free()
 }

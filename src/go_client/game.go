@@ -1,6 +1,7 @@
 package go_client
 
 import (
+	"core"
 	"fmt"
 	"runtime"
 	"strconv"
@@ -26,6 +27,8 @@ var (
 
 	font     *font_helper.Font
 	renderer *sdl.Renderer
+
+	Elasund = core.NewElasund()
 
 	BLACK  = sdl.Color{0, 0, 0, 255}
 	WHITE  = sdl.Color{255, 255, 255, 255}
@@ -60,11 +63,15 @@ func Run() {
 		panic(err)
 	}
 
+	window.SetIcon(t.Icon)
+
 	font = new(font_helper.Font)
 	err = font.Initialize("Miramob.ttf")
 	if err != nil {
 		panic(err)
 	}
+
+	Elasund.Initialize()
 
 	var event sdl.Event
 	var is_running = true
@@ -93,7 +100,9 @@ func Run() {
 				is_running = false
 			case *sdl.MouseButtonEvent:
 				if e.Button == sdl.BUTTON_LEFT && e.State == sdl.PRESSED {
-					mouse_clicked = !mouse_clicked
+					// mouse_clicked = !mouse_clicked
+					cell_x, cell_y := get_cell(mouse_point)
+					Elasund.Build(core.Hotel, cell_x, cell_y, core.Blue)
 				}
 			case *sdl.MouseMotionEvent:
 				mouse_point = &point.Point{int(e.X), int(e.Y)}
@@ -108,6 +117,8 @@ func Run() {
 		}
 
 		draw_text(fmt.Sprintf("Mouse: (%d:%d)", mouse_point.X, mouse_point.Y), &point.Point{725, 20}, WHITE, 16)
+		mouse_cell_x, mouse_cell_y := get_cell(mouse_point)
+		draw_text(fmt.Sprintf("Cell: (%d:%d)", mouse_cell_x, mouse_cell_y), &point.Point{725, 40}, WHITE, 16)
 		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &point.Point{25, 5}, BLACK, 16)
 
 		for i := 0; i < 10; i++ {
@@ -119,8 +130,20 @@ func Run() {
 		t.Common[tm.Common_CornerTop].DrawPoint(get_point(count_players*2, -1))
 		t.Common[tm.Common_CornerBottom].DrawPoint(get_point(count_players*2, 9))
 
+		for _, b := range Elasund.Buildings {
+			if b.OnMap {
+				t.Common[tm.Common_Hotel].DrawPoint(get_point(b.X, b.Y))
+			}
+		}
+
+		if mouse_point.X >= 153 && mouse_point.Y >= 184 {
+			if mouse_point.X < 612 && mouse_point.Y < 694 {
+				t.Common[tm.Common_Hotel].DrawPoint(get_point(get_cell(mouse_point)))
+			}
+		}
+
 		if mouse_clicked {
-			t.Common[tm.Common_CornerTop].DrawPoint(mouse_point)
+			t.Common[tm.Common_Hotel].DrawPoint(mouse_point)
 		}
 
 		renderer.Present()
@@ -156,4 +179,8 @@ func get_point(x int, y int) *point.Point {
 	// X := 153 + x*(step+border)
 	// Y := 184 + y*(step+border)
 	return &point.Point{153 + x*(step+border), 184 + y*(step+border)}
+}
+
+func get_cell(mouse_point *point.Point) (int, int) {
+	return (mouse_point.X - 153) / 51, (mouse_point.Y - 184) / 51
 }

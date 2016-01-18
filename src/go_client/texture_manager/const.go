@@ -1,7 +1,9 @@
 package texture_manager
 
+type Common_TextureType int
+
 const (
-	Common_Board = iota
+	Common_Board Common_TextureType = iota
 	Common_ChurchBack
 	Common_CornerBottom
 	Common_CornerTop
@@ -10,4 +12,6 @@ const (
 	Common_Gold
 	Common_Point
 	Common_Ship
+
+	Common_Hotel
 )
