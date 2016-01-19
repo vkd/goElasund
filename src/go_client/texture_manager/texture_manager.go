@@ -1,6 +1,7 @@
 package texture_manager
 
 import (
+	"core"
 	"path"
 
 	"go_client/constants"
@@ -19,8 +20,14 @@ var (
 		{Common_ChurchBack, "Church0.png"},
 		{Common_CornerBottom, "Corner_bottom.png"},
 		{Common_CornerTop, "Corner_top.png"},
+	}
 
-		{Common_Hotel, "Buildings/Hotel.png"},
+	building_textures = []*struct {
+		T core.BuildingType
+		P string
+	}{
+		{core.Hotel, "Buildings/Hotel.png"},
+		{core.Fair, "Buildings/Fair.png"},
 	}
 )
 
@@ -28,7 +35,8 @@ type TextureManager struct {
 	is_initialized bool
 	renderer       *sdl.Renderer
 
-	Common map[Common_TextureType]*Texture
+	Common    map[Common_TextureType]*Texture
+	Buildings map[core.BuildingType]*Texture
 
 	Icon *sdl.Surface
 }
@@ -36,6 +44,7 @@ type TextureManager struct {
 func (t *TextureManager) Initialize(renderer *sdl.Renderer) error {
 	t.renderer = renderer
 	t.Common = make(map[Common_TextureType]*Texture)
+	t.Buildings = make(map[core.BuildingType]*Texture)
 
 	for _, v := range common_textures {
 		t.Common[v.T] = &Texture{Path: v.S}
@@ -44,6 +53,17 @@ func (t *TextureManager) Initialize(renderer *sdl.Renderer) error {
 	var tex *Texture
 	var err error
 	for _, tex = range t.Common {
+		err = tex.Init(renderer)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, v := range building_textures {
+		t.Buildings[v.T] = &Texture{Path: v.P}
+	}
+
+	for _, tex = range t.Buildings {
 		err = tex.Init(renderer)
 		if err != nil {
 			return err

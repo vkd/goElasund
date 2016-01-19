@@ -34,6 +34,7 @@ var (
 	WHITE  = sdl.Color{255, 255, 255, 255}
 	PURPLE = sdl.Color{100, 10, 100, 255}
 	BLUE   = sdl.Color{10, 10, 255, 255}
+	YELLOW = sdl.Color{255, 255, 100, 255}
 )
 
 func Run() {
@@ -71,7 +72,8 @@ func Run() {
 		panic(err)
 	}
 
-	Elasund.Initialize()
+	count_players := 4
+	Elasund.Initialize(count_players)
 
 	var event sdl.Event
 	var is_running = true
@@ -79,8 +81,7 @@ func Run() {
 
 	var mouse_point *point.Point = &point.Point{0, 0}
 	var mouse_clicked bool
-
-	count_players := 4
+	var mouse_over_map bool
 
 	for _ = range time.Tick(DELTA_FPS) {
 		renderer.SetDrawColor(100, 10, 100, 255)
@@ -102,10 +103,29 @@ func Run() {
 				if e.Button == sdl.BUTTON_LEFT && e.State == sdl.PRESSED {
 					// mouse_clicked = !mouse_clicked
 					cell_x, cell_y := get_cell(mouse_point)
-					Elasund.Build(core.Hotel, cell_x, cell_y, core.Blue)
+					if mouse_over_map {
+						if Elasund.CheckBuild(core.Hotel, cell_x, cell_y, core.Blue) {
+							Elasund.Build(core.Hotel, cell_x, cell_y, core.Blue)
+						}
+					}
+				}
+				if e.Button == sdl.BUTTON_RIGHT && e.State == sdl.PRESSED {
+					cell_x, cell_y := get_cell(mouse_point)
+					if mouse_over_map {
+						if Elasund.CheckBuild(core.Fair, cell_x, cell_y, core.Blue) {
+							Elasund.Build(core.Fair, cell_x, cell_y, core.Blue)
+						}
+					}
 				}
 			case *sdl.MouseMotionEvent:
 				mouse_point = &point.Point{int(e.X), int(e.Y)}
+
+				mouse_over_map = false
+				if mouse_point.X >= 153 && mouse_point.Y >= 184 {
+					if mouse_point.X < 612 && mouse_point.Y < 694 {
+						mouse_over_map = true
+					}
+				}
 			case *sdl.KeyDownEvent:
 				if e.Keysym.Sym == sdl.K_ESCAPE {
 					is_running = false
@@ -113,12 +133,19 @@ func Run() {
 				if e.Keysym.Sym == sdl.K_q {
 					is_running = false
 				}
+				if e.Keysym.Sym == sdl.K_r {
+					for i, _ := range Elasund.Buildings {
+						Elasund.Buildings[i].IsBuild = false
+					}
+				}
 			}
 		}
 
 		draw_text(fmt.Sprintf("Mouse: (%d:%d)", mouse_point.X, mouse_point.Y), &point.Point{725, 20}, WHITE, 16)
-		mouse_cell_x, mouse_cell_y := get_cell(mouse_point)
-		draw_text(fmt.Sprintf("Cell: (%d:%d)", mouse_cell_x, mouse_cell_y), &point.Point{725, 40}, WHITE, 16)
+		if mouse_over_map {
+			mouse_cell_x, mouse_cell_y := get_cell(mouse_point)
+			draw_text(fmt.Sprintf("Cell: (%d:%d)", mouse_cell_x, mouse_cell_y), &point.Point{725, 40}, YELLOW, 16)
+		}
 		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &point.Point{25, 5}, BLACK, 16)
 
 		for i := 0; i < 10; i++ {
@@ -131,19 +158,17 @@ func Run() {
 		t.Common[tm.Common_CornerBottom].DrawPoint(get_point(count_players*2, 9))
 
 		for _, b := range Elasund.Buildings {
-			if b.OnMap {
-				t.Common[tm.Common_Hotel].DrawPoint(get_point(b.X, b.Y))
+			if b.IsBuild {
+				t.Buildings[b.Type].DrawPoint(get_point(b.X, b.Y))
 			}
 		}
 
-		if mouse_point.X >= 153 && mouse_point.Y >= 184 {
-			if mouse_point.X < 612 && mouse_point.Y < 694 {
-				t.Common[tm.Common_Hotel].DrawPoint(get_point(get_cell(mouse_point)))
-			}
+		if mouse_over_map {
+			t.Buildings[core.Fair].DrawPoint(get_point(get_cell(mouse_point)))
 		}
 
 		if mouse_clicked {
-			t.Common[tm.Common_Hotel].DrawPoint(mouse_point)
+			t.Buildings[core.Hotel].DrawPoint(mouse_point)
 		}
 
 		renderer.Present()

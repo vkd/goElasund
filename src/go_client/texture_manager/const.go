@@ -12,6 +12,4 @@ const (
 	Common_Gold
 	Common_Point
 	Common_Ship
-
-	Common_Hotel
 )

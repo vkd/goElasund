@@ -16,9 +16,10 @@ const (
 )
 
 type Building struct {
-	X, Y int
+	X, Y          int
+	Width, Height int
 
-	OnMap bool
+	IsBuild bool
 
 	Type  BuildingType
 	Color PlayerColor
@@ -30,9 +31,33 @@ func (b *Building) Build(x, y int, color PlayerColor) {
 	b.X = x
 	b.Y = y
 	b.Color = color
-	b.OnMap = true
+	b.IsBuild = true
 }
 
 func (b *Building) Destroy() {
-	b.OnMap = false
+	b.IsBuild = false
+}
+
+func (b *Building) Right() int {
+	return b.X + (b.Width - 1)
+}
+
+func (b *Building) Bottom() int {
+	return b.Y + (b.Height - 1)
+}
+
+func (b *Building) Intersect(target *Building) bool {
+	if b.Right() < target.X {
+		return false
+	}
+	if b.X > target.Right() {
+		return false
+	}
+	if b.Bottom() < target.Y {
+		return false
+	}
+	if b.Y > target.Bottom() {
+		return false
+	}
+	return true
 }
