@@ -11,6 +11,8 @@ type Elasund struct {
 	count_players int
 
 	Buildings []*Building
+
+	Board *Board
 }
 
 func NewElasund() (e *Elasund) {
@@ -77,6 +79,8 @@ func (e *Elasund) CheckBuild(building_type BuildingType, x, y int, color PlayerC
 
 func (e *Elasund) Initialize(count_players int) {
 	e.count_players = count_players
+	e.Board = NewBoard(1+(2*count_players), 10)
+	e.Board.Cells[4][5] = &Building{Type: DrawWell}
 	// for i := 1; i <= 9; i++ {
 	// 	e.Buildings = append(e.Buildings, &Building{Type: Church, Value: i})
 	// }

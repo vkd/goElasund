@@ -27,6 +27,10 @@ type Building struct {
 	Value int
 }
 
+func (b *Building) GetType() TileType {
+	return TileType_Building
+}
+
 func (b *Building) Build(x, y int, color PlayerColor) {
 	b.X = x
 	b.Y = y

@@ -35,6 +35,15 @@ var (
 	PURPLE = sdl.Color{100, 10, 100, 255}
 	BLUE   = sdl.Color{10, 10, 255, 255}
 	YELLOW = sdl.Color{255, 255, 100, 255}
+
+	TILE_SIZE        = 50
+	TILE_BORDER_SIZE = 1
+	TILE_STEP        = TILE_SIZE + TILE_BORDER_SIZE
+
+	TILE_START_X = 153
+	TILE_START_Y = 184
+
+	LINE_WIDTH int32 = 3
 )
 
 func Run() {
@@ -163,6 +172,18 @@ func Run() {
 			}
 		}
 
+		for i := 0; i < 9; i++ {
+			for j := 0; j < 10; j++ {
+				cell := Elasund.Board.Cells[i][j]
+				if cell != nil {
+					switch cell.GetType() {
+					case core.TileType_Building:
+						draw_rect(get_point(i, j), 1, 1, BLUE)
+					}
+				}
+			}
+		}
+
 		if mouse_over_map {
 			t.Buildings[core.Fair].DrawPoint(get_point(get_cell(mouse_point)))
 		}
@@ -207,5 +228,36 @@ func get_point(x int, y int) *point.Point {
 }
 
 func get_cell(mouse_point *point.Point) (int, int) {
-	return (mouse_point.X - 153) / 51, (mouse_point.Y - 184) / 51
+	return (mouse_point.X - 153) / TILE_STEP, (mouse_point.Y - 184) / TILE_STEP
+}
+
+func draw_rect(p *point.Point, width, height int, color sdl.Color) {
+	W := int32(width*TILE_STEP - TILE_BORDER_SIZE)
+	H := int32(height*TILE_STEP - TILE_BORDER_SIZE)
+
+	renderer.SetDrawColor(color.R, color.G, color.B, color.A)
+	renderer.FillRect(&sdl.Rect{
+		X: int32(p.X),
+		Y: int32(p.Y),
+		W: W,
+		H: LINE_WIDTH,
+	})
+	renderer.FillRect(&sdl.Rect{
+		X: int32(p.X),
+		Y: int32(p.Y) + H - LINE_WIDTH,
+		W: W,
+		H: LINE_WIDTH,
+	})
+	renderer.FillRect(&sdl.Rect{
+		X: int32(p.X) + W - LINE_WIDTH,
+		Y: int32(p.Y),
+		W: LINE_WIDTH,
+		H: H,
+	})
+	renderer.FillRect(&sdl.Rect{
+		X: int32(p.X),
+		Y: int32(p.Y),
+		W: LINE_WIDTH,
+		H: H,
+	})
 }
