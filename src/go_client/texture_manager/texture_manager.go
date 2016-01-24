@@ -26,8 +26,9 @@ var (
 		T core.BuildingType
 		P string
 	}{
-		{core.Hotel, "Buildings/Hotel.png"},
-		{core.Fair, "Buildings/Fair.png"},
+		{core.BuildingType_DrawWell, "Buildings/DrawWell.png"},
+		{core.BuildingType_Fair, "Buildings/Fair.png"},
+		{core.BuildingType_Hotel, "Buildings/Hotel.png"},
 	}
 )
 

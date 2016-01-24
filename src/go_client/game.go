@@ -2,17 +2,11 @@ package go_client
 
 import (
 	"core"
-	"fmt"
-	"runtime"
-	"strconv"
 	"time"
 
 	font_helper "go_client/font"
-	"go_client/point"
-	tm "go_client/texture_manager"
 
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/sdl_ttf"
 )
 
 const (
@@ -35,6 +29,7 @@ var (
 	PURPLE = sdl.Color{100, 10, 100, 255}
 	BLUE   = sdl.Color{10, 10, 255, 255}
 	YELLOW = sdl.Color{255, 255, 100, 255}
+	GREEN  = sdl.Color{10, 255, 10, 255}
 
 	TILE_SIZE        = 50
 	TILE_BORDER_SIZE = 1
@@ -46,218 +41,72 @@ var (
 	LINE_WIDTH int32 = 3
 )
 
-func Run() {
-	runtime.LockOSThread()
-	err := sdl.Init(sdl.INIT_EVERYTHING)
-	if err != nil {
-		panic(err)
-	}
+// type Game struct {
+// 	is_running bool
+// }
 
-	window, err := sdl.CreateWindow("Elasund", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, sdl.WINDOW_RESIZABLE)
-	if err != nil {
-		panic(err)
-	}
-	defer window.Destroy()
+// func (g *Game) Init() {
 
-	ttf.Init()
+// }
 
-	renderer, err = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
-	if err != nil {
-		panic(err)
-	}
-	defer renderer.Destroy()
+// func (g *Game) MainLoop() {
+// 	for _ = range time.Tick(DELTA_FPS) {
 
-	t := tm.TextureManager{}
-	err = t.Initialize(renderer)
-	if err != nil {
-		panic(err)
-	}
+// 		g.update_events()
 
-	window.SetIcon(t.Icon)
+// 		if !g.is_running {
+// 			break
+// 		}
+// 	}
+// }
 
-	font = new(font_helper.Font)
-	err = font.Initialize("Miramob.ttf")
-	if err != nil {
-		panic(err)
-	}
+// func (g *Game) update_events() {
+// 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+// 		switch e := event.(type) {
+// 		case *sdl.QuitEvent:
+// 			g.stop_loop()
+// 		case *sdl.MouseButtonEvent:
+// 			if e.Button == sdl.BUTTON_LEFT && e.State == sdl.PRESSED {
+// 				cell_x, cell_y := get_cell(mouse_point)
+// 				if mouse_over_map {
+// 					if Elasund.CheckBuild(core.Hotel, cell_x, cell_y, core.Blue) {
+// 						Elasund.Build(core.Hotel, cell_x, cell_y, core.Blue)
+// 					}
+// 				}
+// 			}
+// 			if e.Button == sdl.BUTTON_RIGHT && e.State == sdl.PRESSED {
+// 				cell_x, cell_y := get_cell(mouse_point)
+// 				if mouse_over_map {
+// 					if Elasund.CheckBuild(core.Fair, cell_x, cell_y, core.Blue) {
+// 						Elasund.Build(core.Fair, cell_x, cell_y, core.Blue)
+// 					}
+// 				}
+// 			}
+// 		case *sdl.MouseMotionEvent:
+// 			mouse_point = &point.Point{int(e.X), int(e.Y)}
 
-	count_players := 4
-	Elasund.Initialize(count_players)
+// 			mouse_over_map = false
+// 			if mouse_point.X >= 153 && mouse_point.Y >= 184 {
+// 				if mouse_point.X < 612 && mouse_point.Y < 694 {
+// 					mouse_over_map = true
+// 				}
+// 			}
+// 		case *sdl.KeyDownEvent:
+// 			if e.Keysym.Sym == sdl.K_ESCAPE {
+// 				g.stop_loop()
+// 			}
+// 			if e.Keysym.Sym == sdl.K_q {
+// 				g.stop_loop()
+// 			}
+// 			if e.Keysym.Sym == sdl.K_r {
+// 				for i, _ := range Elasund.Buildings {
+// 					Elasund.Buildings[i].IsBuild = false
+// 				}
+// 			}
+// 		}
+// 	}
+// }
 
-	var event sdl.Event
-	var is_running = true
-	var time_fps time.Time
-
-	var mouse_point *point.Point = &point.Point{0, 0}
-	var mouse_clicked bool
-	var mouse_over_map bool
-
-	for _ = range time.Tick(DELTA_FPS) {
-		renderer.SetDrawColor(100, 10, 100, 255)
-		renderer.Clear()
-
-		t.Common[tm.Common_Board].Draw(0, 0)
-
-		ns := time.Since(time_fps).Nanoseconds()
-		fps_now := int64(time.Second) / ns
-		time_fps = time.Now()
-
-		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &point.Point{25, 5}, WHITE, 16)
-
-		for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch e := event.(type) {
-			case *sdl.QuitEvent:
-				is_running = false
-			case *sdl.MouseButtonEvent:
-				if e.Button == sdl.BUTTON_LEFT && e.State == sdl.PRESSED {
-					// mouse_clicked = !mouse_clicked
-					cell_x, cell_y := get_cell(mouse_point)
-					if mouse_over_map {
-						if Elasund.CheckBuild(core.Hotel, cell_x, cell_y, core.Blue) {
-							Elasund.Build(core.Hotel, cell_x, cell_y, core.Blue)
-						}
-					}
-				}
-				if e.Button == sdl.BUTTON_RIGHT && e.State == sdl.PRESSED {
-					cell_x, cell_y := get_cell(mouse_point)
-					if mouse_over_map {
-						if Elasund.CheckBuild(core.Fair, cell_x, cell_y, core.Blue) {
-							Elasund.Build(core.Fair, cell_x, cell_y, core.Blue)
-						}
-					}
-				}
-			case *sdl.MouseMotionEvent:
-				mouse_point = &point.Point{int(e.X), int(e.Y)}
-
-				mouse_over_map = false
-				if mouse_point.X >= 153 && mouse_point.Y >= 184 {
-					if mouse_point.X < 612 && mouse_point.Y < 694 {
-						mouse_over_map = true
-					}
-				}
-			case *sdl.KeyDownEvent:
-				if e.Keysym.Sym == sdl.K_ESCAPE {
-					is_running = false
-				}
-				if e.Keysym.Sym == sdl.K_q {
-					is_running = false
-				}
-				if e.Keysym.Sym == sdl.K_r {
-					for i, _ := range Elasund.Buildings {
-						Elasund.Buildings[i].IsBuild = false
-					}
-				}
-			}
-		}
-
-		draw_text(fmt.Sprintf("Mouse: (%d:%d)", mouse_point.X, mouse_point.Y), &point.Point{725, 20}, WHITE, 16)
-		if mouse_over_map {
-			mouse_cell_x, mouse_cell_y := get_cell(mouse_point)
-			draw_text(fmt.Sprintf("Cell: (%d:%d)", mouse_cell_x, mouse_cell_y), &point.Point{725, 40}, YELLOW, 16)
-		}
-		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &point.Point{25, 5}, BLACK, 16)
-
-		for i := 0; i < 10; i++ {
-			for j := -1; j < 11; j++ {
-				draw_text(fmt.Sprintf("(%d, %d)", i, j), get_point(i, j).Move(8, 10), BLUE, 12)
-			}
-		}
-
-		t.Common[tm.Common_CornerTop].DrawPoint(get_point(count_players*2, -1))
-		t.Common[tm.Common_CornerBottom].DrawPoint(get_point(count_players*2, 9))
-
-		for _, b := range Elasund.Buildings {
-			if b.IsBuild {
-				t.Buildings[b.Type].DrawPoint(get_point(b.X, b.Y))
-			}
-		}
-
-		for i := 0; i < 9; i++ {
-			for j := 0; j < 10; j++ {
-				cell := Elasund.Board.Cells[i][j]
-				if cell != nil {
-					switch cell.GetType() {
-					case core.TileType_Building:
-						draw_rect(get_point(i, j), 1, 1, BLUE)
-					}
-				}
-			}
-		}
-
-		if mouse_over_map {
-			t.Buildings[core.Fair].DrawPoint(get_point(get_cell(mouse_point)))
-		}
-
-		if mouse_clicked {
-			t.Buildings[core.Hotel].DrawPoint(mouse_point)
-		}
-
-		renderer.Present()
-
-		if !is_running {
-			break
-		}
-	}
-	t.Close()
-	sdl.Quit()
-}
-
-func draw_text(text string, pos *point.Point, color sdl.Color, size int) {
-	surf, err := font.Size(size).RenderUTF8_Blended(text, color)
-	if err != nil {
-		panic(err)
-	}
-	defer surf.Free()
-	text_texture, err := renderer.CreateTextureFromSurface(surf)
-	if err != nil {
-		panic(err)
-	}
-	defer text_texture.Destroy()
-	err = renderer.Copy(text_texture, nil, &sdl.Rect{int32(pos.X), int32(pos.Y), surf.W, surf.H})
-	if err != nil {
-		panic(err)
-	}
-}
-
-func get_point(x int, y int) *point.Point {
-	step := 50
-	border := 1
-	// X := 153 + x*(step+border)
-	// Y := 184 + y*(step+border)
-	return &point.Point{153 + x*(step+border), 184 + y*(step+border)}
-}
-
-func get_cell(mouse_point *point.Point) (int, int) {
-	return (mouse_point.X - 153) / TILE_STEP, (mouse_point.Y - 184) / TILE_STEP
-}
-
-func draw_rect(p *point.Point, width, height int, color sdl.Color) {
-	W := int32(width*TILE_STEP - TILE_BORDER_SIZE)
-	H := int32(height*TILE_STEP - TILE_BORDER_SIZE)
-
-	renderer.SetDrawColor(color.R, color.G, color.B, color.A)
-	renderer.FillRect(&sdl.Rect{
-		X: int32(p.X),
-		Y: int32(p.Y),
-		W: W,
-		H: LINE_WIDTH,
-	})
-	renderer.FillRect(&sdl.Rect{
-		X: int32(p.X),
-		Y: int32(p.Y) + H - LINE_WIDTH,
-		W: W,
-		H: LINE_WIDTH,
-	})
-	renderer.FillRect(&sdl.Rect{
-		X: int32(p.X) + W - LINE_WIDTH,
-		Y: int32(p.Y),
-		W: LINE_WIDTH,
-		H: H,
-	})
-	renderer.FillRect(&sdl.Rect{
-		X: int32(p.X),
-		Y: int32(p.Y),
-		W: LINE_WIDTH,
-		H: H,
-	})
-}
+// func (g *Game) stop_loop() {
+// 	g.is_running = false
+// }

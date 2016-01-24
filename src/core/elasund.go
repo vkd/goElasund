@@ -80,27 +80,31 @@ func (e *Elasund) CheckBuild(building_type BuildingType, x, y int, color PlayerC
 func (e *Elasund) Initialize(count_players int) {
 	e.count_players = count_players
 	e.Board = NewBoard(1+(2*count_players), 10)
-	e.Board.Cells[4][5] = &Building{Type: DrawWell}
+	// e.Board.Cells[4][5] = NewBuildingDrawWell()
 	// for i := 1; i <= 9; i++ {
 	// 	e.Buildings = append(e.Buildings, &Building{Type: Church, Value: i})
 	// }
 	for i := 0; i < 4; i++ {
-		e.Buildings = append(e.Buildings, &Building{Type: DrawWell})
+		e.Buildings = append(e.Buildings, NewBuildingDrawWell())
 	}
 	for i := 0; i < 4; i++ {
-		e.Buildings = append(e.Buildings, &Building{Type: Fair, Width: 2, Height: 1})
+		e.Buildings = append(e.Buildings, NewBuildingFair())
 	}
+	b := e.Buildings[5]
+	b.Build(4, 5, PlayerColor_Blue)
+	e.Board.Cells[4][5] = b
+	e.Board.Cells[5][5] = &Ref{b}
 	// for i := 1; i < 3; i++ {
 	// 	e.Buildings = append(e.Buildings, &Building{Type: Government, Value: i})
 	// }
-	for i := 0; i < 5; i++ {
-		e.Buildings = append(e.Buildings, &Building{Type: Hotel, Width: 2, Height: 2})
-	}
+	// for i := 0; i < 5; i++ {
+	// 	e.Buildings = append(e.Buildings, NewBuildingHotel())
+	// }
 	// for i := 0; i < 5; i++ {
 	//     e.Buildings = append(e.Buildings, &Building{Type: House})
 	// }
 
-	for i := 0; i < 5; i++ {
-		e.Buildings = append(e.Buildings, &Building{Type: Shop})
-	}
+	// for i := 0; i < 5; i++ {
+	// 	e.Buildings = append(e.Buildings, NewBuildingShop())
+	// }
 }

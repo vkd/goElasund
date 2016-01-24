@@ -3,16 +3,16 @@ package core
 type BuildingType int
 
 const (
-	Church BuildingType = iota
-	DrawWell
-	Fair
-	Government
-	Hotel
-	House
-	Shop
-	SmallTotem
-	Totem
-	Workshop
+	BuildingType_Church BuildingType = iota
+	BuildingType_DrawWell
+	BuildingType_Fair
+	BuildingType_Government
+	BuildingType_Hotel
+	BuildingType_House
+	BuildingType_Shop
+	BuildingType_SmallTotem
+	BuildingType_Totem
+	BuildingType_Workshop
 )
 
 type Building struct {

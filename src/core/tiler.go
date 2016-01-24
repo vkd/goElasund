@@ -9,4 +9,5 @@ type TileType int
 const (
 	TileType_Building TileType = iota
 	TileType_Claim
+	TileType_Ref
 )
