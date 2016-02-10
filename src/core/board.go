@@ -17,12 +17,11 @@ func NewBoard(width, height int) (b *Board) {
 	return b
 }
 
-func (b *Board) Build(building *Building, x, y int, color PlayerColor) {
-	if !b.CheckFreeBuilding(building, x, y, color) {
+func (b *Board) PlaceBuilding(building *Building, x, y int) {
+	if !b.checkFreeBuilding(building, x, y, color) {
 		return
 	}
 
-	building.Build(x, y, color)
 	b.Cells[x][y] = building
 
 	for i := 0; i < building.Width; i++ {
@@ -35,7 +34,10 @@ func (b *Board) Build(building *Building, x, y int, color PlayerColor) {
 	}
 }
 
-func (b *Board) CheckFreeBuilding(building *Building, x, y int, color PlayerColor) bool {
+func (b *Board) checkFreeBuilding(building *Building, x, y int, color PlayerColor) bool {
+	if building.IsBuild {
+		return false
+	}
 	for i := x; i < x+building.Width; i++ {
 		if i >= b.width {
 			return false
