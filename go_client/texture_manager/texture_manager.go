@@ -1,14 +1,14 @@
 package texture_manager
 
 import (
-	"core"
+	"goElasund/core"
 	"path"
 
-	"go_client/constants"
-	"go_client/texture_manager/tm_errors"
+	"goElasund/go_client/constants"
+	"goElasund/go_client/texture_manager/tm_errors"
 
+	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/sdl_image"
 )
 
 var (
@@ -26,9 +26,9 @@ var (
 		T core.BuildingType
 		P string
 	}{
-		{core.BuildingType_DrawWell, "Buildings/DrawWell.png"},
-		{core.BuildingType_Fair, "Buildings/Fair.png"},
-		{core.BuildingType_Hotel, "Buildings/Hotel.png"},
+		{core.DrawWell, "Buildings/DrawWell.png"},
+		{core.Fair, "Buildings/Fair.png"},
+		{core.Hotel, "Buildings/Hotel.png"},
 	}
 )
 
@@ -97,7 +97,7 @@ func (t *TextureManager) load_file_as_surface(path_file string) (*sdl.Surface, e
 	full_path := path.Join(constants.BASE_DIR, "textures", path_file)
 	f := sdl.RWFromFile(full_path, "rb")
 	defer f.RWclose()
-	s, err := img.LoadPNG_RW(f)
+	s, err := img.LoadPNGRW(f)
 	if err != nil {
 		return nil, &tm_errors.LoadTextureError{full_path, err}
 	}

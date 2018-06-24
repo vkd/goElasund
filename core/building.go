@@ -1,18 +1,20 @@
 package core
 
+// BuildingType - type of buildings
 type BuildingType int
 
+// Buildings
 const (
-	BuildingType_Church BuildingType = iota
-	BuildingType_DrawWell
-	BuildingType_Fair
-	BuildingType_Government
-	BuildingType_Hotel
-	BuildingType_House
-	BuildingType_Shop
-	BuildingType_SmallTotem
-	BuildingType_Totem
-	BuildingType_Workshop
+	Church BuildingType = iota
+	DrawWell
+	Fair
+	Government
+	Hotel
+	House
+	Shop
+	SmallTotem
+	Totem
+	Workshop
 )
 
 type Building struct {

@@ -1,13 +1,13 @@
 package go_client
 
 import (
-	"go_client/point"
+	"goElasund/go_client/point"
 
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 func draw_text(text string, pos *point.Point, color sdl.Color, size int) {
-	surf, err := font.Size(size).RenderUTF8_Blended(text, color)
+	surf, err := font.Size(size).RenderUTF8Blended(text, color)
 	if err != nil {
 		panic(err)
 	}
@@ -68,5 +68,5 @@ func draw_rect(p *point.Point, width, height int, color sdl.Color) {
 
 func draw_line(p1 *point.Point, p2 *point.Point, color sdl.Color) {
 	renderer.SetDrawColor(color.R, color.G, color.B, color.A)
-	renderer.DrawLine(p1.X, p1.Y, p2.X, p2.Y)
+	renderer.DrawLine(int32(p1.X), int32(p1.Y), int32(p2.X), int32(p2.Y))
 }

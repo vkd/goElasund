@@ -1,18 +1,18 @@
 package go_client
 
 import (
-	"core"
 	"fmt"
+	"goElasund/core"
 	"runtime"
 	"strconv"
 	"time"
 
-	font_helper "go_client/font"
-	"go_client/point"
-	tm "go_client/texture_manager"
+	font_helper "goElasund/go_client/font"
+	"goElasund/go_client/point"
+	tm "goElasund/go_client/texture_manager"
 
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/sdl_ttf"
+	"github.com/veandco/go-sdl2/ttf"
 )
 
 func Run() {
@@ -55,22 +55,50 @@ func Run() {
 
 	var event sdl.Event
 	var is_running = true
-	var time_fps time.Time
+	// var time_fps time.Time
 
 	var mouse_point *point.Point = &point.Point{0, 0}
 	var mouse_over_map bool
 
-	for _ = range time.Tick(DELTA_FPS) {
+	var now time.Time
+	var prevNow time.Time
+	// prevNow = time.Now().Add(-DELTA_FPS)
+	var workDelta, sleepDelta time.Duration
+	var fps_now float64 = FPS
+
+	var fpsTime time.Time
+	// var fpsTimeNow time.Time
+
+	for {
+		now = time.Now()
+		// log.Printf("    now: %v", now)
+		// SLEEP
+		// DELTA_FPS == workDelta + sleepDelta
+		workDelta = now.Sub(prevNow)
+
+		fps_now = float64(time.Second) / float64(now.Sub(fpsTime).Nanoseconds())
+		fpsTime = now
+
+		sleepDelta = DELTA_FPS - workDelta
+		if sleepDelta < 0 {
+			sleepDelta = 0
+		}
+		// log.Printf("\nworkDelta: %v\nsleepDelta: %v", workDelta, sleepDelta)
+		time.Sleep(sleepDelta)
+		prevNow = now.Add(sleepDelta)
+
+		// log.Printf("prevNow: %v (%v) (%v)", prevNow, int64(fps_now), fps_now)
+
+		// WORK
 		renderer.SetDrawColor(100, 10, 100, 255)
 		renderer.Clear()
 
 		t.Common[tm.Common_Board].Draw(0, 0)
 
-		ns := time.Since(time_fps).Nanoseconds()
-		fps_now := int64(time.Second) / ns
-		time_fps = time.Now()
+		// fpsTimeNow = time.Now()
+		draw_text("FPS: "+strconv.FormatInt(int64(fps_now+0.5), 10), &point.Point{25, 5}, WHITE, 16)
 
-		draw_text("FPS: "+strconv.Itoa(int(fps_now)), &point.Point{25, 5}, WHITE, 16)
+		// log.Printf("fps: %v (%v)", fpsTime, fps_now)
 
 		for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch e := event.(type) {
@@ -80,16 +108,16 @@ func Run() {
 				if e.Button == sdl.BUTTON_LEFT && e.State == sdl.PRESSED {
 					cell_x, cell_y := get_cell(mouse_point)
 					if mouse_over_map {
-						if Elasund.CheckBuild(core.BuildingType_Hotel, cell_x, cell_y, core.PlayerColor_Blue) {
-							Elasund.Build(core.BuildingType_Hotel, cell_x, cell_y, core.PlayerColor_Blue)
+						if Elasund.CheckBuild(core.Hotel, cell_x, cell_y, core.PlayerColor_Blue) {
+							Elasund.Build(core.Hotel, cell_x, cell_y, core.PlayerColor_Blue)
 						}
 					}
 				}
 				if e.Button == sdl.BUTTON_RIGHT && e.State == sdl.PRESSED {
 					cell_x, cell_y := get_cell(mouse_point)
 					if mouse_over_map {
-						if Elasund.CheckBuild(core.BuildingType_Fair, cell_x, cell_y, core.PlayerColor_Blue) {
-							Elasund.Build(core.BuildingType_Fair, cell_x, cell_y, core.PlayerColor_Blue)
+						if Elasund.CheckBuild(core.Fair, cell_x, cell_y, core.PlayerColor_Blue) {
+							Elasund.Build(core.Fair, cell_x, cell_y, core.PlayerColor_Blue)
 						}
 					}
 				}
@@ -102,7 +130,7 @@ func Run() {
 						mouse_over_map = true
 					}
 				}
-			case *sdl.KeyDownEvent:
+			case *sdl.KeyboardEvent:
 				if e.Keysym.Sym == sdl.K_ESCAPE {
 					is_running = false
 				}
@@ -163,7 +191,7 @@ func Run() {
 		}
 
 		if mouse_over_map {
-			t.Buildings[core.BuildingType_Fair].DrawPoint(get_point(get_cell(mouse_point)))
+			t.Buildings[core.Fair].DrawPoint(get_point(get_cell(mouse_point)))
 		}
 
 		renderer.Present()

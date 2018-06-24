@@ -1,13 +1,13 @@
 package texture_manager
 
 import (
-	"go_client/constants"
-	"go_client/point"
-	"go_client/texture_manager/tm_errors"
+	"goElasund/go_client/constants"
+	"goElasund/go_client/point"
+	"goElasund/go_client/texture_manager/tm_errors"
 	"path"
 
+	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/sdl_image"
 )
 
 type Texture struct {
@@ -41,7 +41,7 @@ func (t *Texture) load_file(path_file string) (*sdl.Texture, error) {
 	full_path := path.Join(constants.BASE_DIR, "textures", path_file)
 	f := sdl.RWFromFile(full_path, "rb")
 	defer f.RWclose()
-	s, err := img.LoadPNG_RW(f)
+	s, err := img.LoadPNGRW(f)
 	if err != nil {
 		return nil, &tm_errors.LoadTextureError{full_path, err}
 	}

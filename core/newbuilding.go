@@ -2,7 +2,7 @@ package core
 
 func NewBuildingChurch(value int) *Building {
 	return &Building{
-		Type:   BuildingType_Church,
+		Type:   Church,
 		Width:  1,
 		Height: 1,
 		Value:  value,
@@ -11,7 +11,7 @@ func NewBuildingChurch(value int) *Building {
 
 func NewBuildingDrawWell() *Building {
 	return &Building{
-		Type:   BuildingType_DrawWell,
+		Type:   DrawWell,
 		Width:  1,
 		Height: 1,
 	}
@@ -19,7 +19,7 @@ func NewBuildingDrawWell() *Building {
 
 func NewBuildingFair() *Building {
 	return &Building{
-		Type:   BuildingType_Fair,
+		Type:   Fair,
 		Width:  2,
 		Height: 1,
 	}
@@ -27,7 +27,7 @@ func NewBuildingFair() *Building {
 
 func NewBuildingGovernment(value int) *Building {
 	return &Building{
-		Type:   BuildingType_Government,
+		Type:   Government,
 		Width:  2,
 		Height: 3,
 		Value:  value,

@@ -23,22 +23,22 @@ func NewElasund() (e *Elasund) {
 }
 
 func (e *Elasund) Build(building_type BuildingType, x, y int, color PlayerColor) {
-	var building *Building
-	for _, b := range e.Buildings {
-		if b.IsBuild {
-			continue
-		}
-		if b.Type != building_type {
-			continue
-		}
-		building = b
-		break
-	}
-	if b == nil {
-		return
-	}
-	b.Build(x, y, color)
-	e.Board.PlaceBuilding(b, x, y)
+	// var building *Building
+	// for _, b := range e.Buildings {
+	// 	if b.IsBuild {
+	// 		continue
+	// 	}
+	// 	if b.Type != building_type {
+	// 		continue
+	// 	}
+	// 	building = b
+	// 	break
+	// }
+	// if b == nil {
+	// 	return
+	// }
+	// b.Build(x, y, color)
+	// e.Board.PlaceBuilding(b, x, y)
 }
 
 func (e *Elasund) CheckBuild(building_type BuildingType, x, y int, color PlayerColor) bool {

@@ -1,10 +1,10 @@
 package font
 
 import (
-	"go_client/constants"
+	"goElasund/go_client/constants"
 	"path"
 
-	"github.com/veandco/go-sdl2/sdl_ttf"
+	"github.com/veandco/go-sdl2/ttf"
 )
 
 type Font struct {

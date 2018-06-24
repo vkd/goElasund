@@ -18,20 +18,20 @@ func NewBoard(width, height int) (b *Board) {
 }
 
 func (b *Board) PlaceBuilding(building *Building, x, y int) {
-	if !b.checkFreeBuilding(building, x, y, color) {
-		return
-	}
+	// if !b.checkFreeBuilding(building, x, y, color) {
+	// 	return
+	// }
 
-	b.Cells[x][y] = building
+	// b.Cells[x][y] = building
 
-	for i := 0; i < building.Width; i++ {
-		for j := 0; j < building.Height; j++ {
-			if i == j && i == 0 {
-				continue
-			}
-			b.Cells[x+i][y+j] = &Ref{Object: building}
-		}
-	}
+	// for i := 0; i < building.Width; i++ {
+	// 	for j := 0; j < building.Height; j++ {
+	// 		if i == j && i == 0 {
+	// 			continue
+	// 		}
+	// 		b.Cells[x+i][y+j] = &Ref{Object: building}
+	// 	}
+	// }
 }
 
 func (b *Board) checkFreeBuilding(building *Building, x, y int, color PlayerColor) bool {

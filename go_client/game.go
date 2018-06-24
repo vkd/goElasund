@@ -1,10 +1,10 @@
 package go_client
 
 import (
-	"core"
+	"goElasund/core"
 	"time"
 
-	font_helper "go_client/font"
+	font_helper "goElasund/go_client/font"
 
 	"github.com/veandco/go-sdl2/sdl"
 )

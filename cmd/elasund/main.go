@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go_client"
+	"goElasund/go_client"
 )
 
 func main() {

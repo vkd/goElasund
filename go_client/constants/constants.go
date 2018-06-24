@@ -1,5 +1,5 @@
 package constants
 
 const (
-	BASE_DIR = ".."
+	BASE_DIR = "."
 )
