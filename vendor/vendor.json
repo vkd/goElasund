@@ -1,0 +1,25 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "YarcJqtHbJ8291JeH/XOYOajL7U=",
+			"path": "github.com/veandco/go-sdl2/img",
+			"revision": "09947465530acd69d7795b2c6514d8cc6a99728c",
+			"revisionTime": "2018-06-18T05:49:24Z"
+		},
+		{
+			"checksumSHA1": "LkVGKuKmD0l9r/Ep8FftDr2Pszs=",
+			"path": "github.com/veandco/go-sdl2/sdl",
+			"revision": "09947465530acd69d7795b2c6514d8cc6a99728c",
+			"revisionTime": "2018-06-18T05:49:24Z"
+		},
+		{
+			"checksumSHA1": "JuCRvuq07qJ1X0gksMcCcet3ZD8=",
+			"path": "github.com/veandco/go-sdl2/ttf",
+			"revision": "09947465530acd69d7795b2c6514d8cc6a99728c",
+			"revisionTime": "2018-06-18T05:49:24Z"
+		}
+	],
+	"rootPath": "goElasund"
+}
