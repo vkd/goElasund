@@ -1,6 +1,7 @@
 package texture_manager
 
 import (
+	"fmt"
 	"goElasund/core"
 	"path"
 
@@ -29,6 +30,17 @@ var (
 		{core.DrawWell, "Buildings/DrawWell.png"},
 		{core.Fair, "Buildings/Fair.png"},
 		{core.Hotel, "Buildings/Hotel.png"},
+		{core.Shop, "Buildings/Shop.png"},
+	}
+
+	usersTextures = []*struct {
+		T core.BuildingType
+		P string
+	}{
+		{core.House, "Buildings/House%d.png"},
+		{core.SmallTotem, "Buildings/SmallTotem%d.png"},
+		{core.Totem, "Buildings/Totem%d.png"},
+		{core.Workshop, "Buildings/WorkShop%d.png"},
 	}
 )
 
@@ -37,7 +49,7 @@ type TextureManager struct {
 	renderer       *sdl.Renderer
 
 	Common    map[Common_TextureType]*Texture
-	Buildings map[core.BuildingType]*Texture
+	Buildings map[core.BuildingType][]*Texture
 
 	Icon *sdl.Surface
 }
@@ -45,7 +57,7 @@ type TextureManager struct {
 func (t *TextureManager) Initialize(renderer *sdl.Renderer) error {
 	t.renderer = renderer
 	t.Common = make(map[Common_TextureType]*Texture)
-	t.Buildings = make(map[core.BuildingType]*Texture)
+	t.Buildings = make(map[core.BuildingType][]*Texture)
 
 	for _, v := range common_textures {
 		t.Common[v.T] = &Texture{Path: v.S}
@@ -61,13 +73,34 @@ func (t *TextureManager) Initialize(renderer *sdl.Renderer) error {
 	}
 
 	for _, v := range building_textures {
-		t.Buildings[v.T] = &Texture{Path: v.P}
+		t.Buildings[v.T] = []*Texture{&Texture{Path: v.P}}
+	}
+	for _, v := range usersTextures {
+		for _, p := range core.AllPlayers {
+			t.Buildings[v.T] = append(t.Buildings[v.T], &Texture{Path: fmt.Sprintf(v.P, int(p))})
+		}
 	}
 
-	for _, tex = range t.Buildings {
-		err = tex.Init(renderer)
-		if err != nil {
-			return err
+	t.Buildings[core.Government] = append(t.Buildings[core.Government], nil)
+	for i := 0; i < 3; i++ {
+		t.Buildings[core.Government] = append(t.Buildings[core.Government], &Texture{
+			Path: fmt.Sprintf("Buildings/Government%d.png", i+1),
+		})
+	}
+
+	t.Buildings[core.Church] = append(t.Buildings[core.Church], nil)
+	for i := 0; i < 9; i++ {
+		t.Buildings[core.Church] = append(t.Buildings[core.Church], &Texture{
+			Path: fmt.Sprintf("Buildings/Church%d.png", i+1),
+		})
+	}
+
+	for _, tt := range t.Buildings {
+		for _, tex := range tt {
+			err = tex.Init(renderer)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

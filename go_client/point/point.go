@@ -1,8 +1,8 @@
 package point
 
-type Point struct {
-	X, Y int
-}
+import "goElasund/core"
+
+type Point core.Vector
 
 func (p *Point) Add(point Point) *Point {
 	p.X += point.X

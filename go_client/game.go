@@ -25,6 +25,7 @@ var (
 	Elasund = core.NewElasund()
 
 	BLACK  = sdl.Color{0, 0, 0, 255}
+	GREY   = sdl.Color{100, 100, 100, 100}
 	WHITE  = sdl.Color{255, 255, 255, 255}
 	PURPLE = sdl.Color{100, 10, 100, 255}
 	BLUE   = sdl.Color{10, 10, 255, 255}

@@ -18,6 +18,9 @@ type Texture struct {
 }
 
 func (t *Texture) Init(rend *sdl.Renderer) error {
+	if t == nil {
+		return nil
+	}
 	t.renderer = rend
 	var err error
 	t.texture, err = t.load_file(t.Path)

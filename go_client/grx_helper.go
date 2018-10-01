@@ -23,16 +23,16 @@ func draw_text(text string, pos *point.Point, color sdl.Color, size int) {
 	}
 }
 
-func get_point(x int, y int) *point.Point {
+func get_point(v point.Point) *point.Point {
 	step := 50
 	border := 1
 	// X := 153 + x*(step+border)
 	// Y := 184 + y*(step+border)
-	return &point.Point{153 + x*(step+border), 184 + y*(step+border)}
+	return &point.Point{153 + v.X*(step+border), 184 + v.Y*(step+border)}
 }
 
-func get_cell(mouse_point *point.Point) (int, int) {
-	return (mouse_point.X - 153) / TILE_STEP, (mouse_point.Y - 184) / TILE_STEP
+func get_cell(mouse_point *point.Point) point.Point {
+	return point.Point{(mouse_point.X - 153) / TILE_STEP, (mouse_point.Y - 184) / TILE_STEP}
 }
 
 func draw_rect(p *point.Point, width, height int, color sdl.Color) {

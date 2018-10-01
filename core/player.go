@@ -6,9 +6,14 @@ type PlayerColor int
 
 const (
 	PlayerColor_Red PlayerColor = iota
-	PlayerColor_Blue
 	PlayerColor_Green
+	PlayerColor_Blue
 	PlayerColor_Yellow
+)
+
+var (
+	// AllPlayers - list of all players
+	AllPlayers = []PlayerColor{PlayerColor_Red, PlayerColor_Green, PlayerColor_Blue, PlayerColor_Yellow}
 )
 
 // Player of game
