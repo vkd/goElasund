@@ -14,6 +14,9 @@ const (
 	windowWidth  = 1280
 	windowHeight = 800
 
+	windowXCenter = int32(windowWidth / 2)
+	windowYCenter = int32(windowHeight / 2)
+
 	fps          = 60
 	deltaTimeFPS = time.Duration(time.Second / fps)
 
@@ -50,16 +53,16 @@ func Run() error {
 
 	draw := &Draw{renderer: renderer}
 
-	var update Update
+	// var update Update
 
 	var stages Stages
-	stages.Add(StageNameMainMenu, MainMenuGameStage(draw))
-	stages.Add("2", func() {
+	stages.Add(StageNameMainMenu, NewMainMenuStage(&stages))
+	stages.Add(StageNameIncome, DrawOnlyStage(func(draw *Draw) {
 		draw.Clear(blue)
-	})
-	stages.Add("3", func() {
+	}))
+	stages.Add("3", DrawOnlyStage(func(draw *Draw) {
 		draw.Clear(purple)
-	})
+	}))
 
 	// t := tm.TextureManager{}
 	// err = t.Initialize(renderer)
@@ -77,8 +80,8 @@ func Run() error {
 	var isRunning = true
 	var fpsLastTime time.Time
 
-	var mousePoint Point
-	update.Mouse = &mousePoint
+	var mousePoint = &MouseEvent{}
+	// update.Mouse = &mousePoint
 	// var mouse_over_map bool
 
 	// var events = make(chan *Event, 1000)
@@ -87,7 +90,7 @@ func Run() error {
 		renderer.SetDrawColor(100, 10, 100, 255)
 		renderer.Clear()
 
-		stages.Run()
+		stages.Draw(draw)
 
 		// 	t.Common[tm.Common_Board].Draw(0, 0)
 
@@ -96,46 +99,39 @@ func Run() error {
 		fpsLastTime = time.Now()
 
 		// draw_text("FPS: "+strconv.Itoa(int(currentFPS)), &point.Point{25, 5}, WHITE, 16)
-		draw.Text("FPS: "+strconv.Itoa(currentFPS), 25, 5, white, 16)
+		draw.Text("FPS: "+strconv.Itoa(currentFPS), Point{X: 25, Y: 5}, white, 16)
 
 		for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch e := event.(type) {
 			case *sdl.QuitEvent:
 				isRunning = false
-			// case *sdl.MouseButtonEvent:
-			// 	switch e.Button {
-			// 	case sdl.BUTTON_LEFT:
-			// 		e.State == sdl.PRESSED
-			// 	}
-			// if e.Button == sdl.BUTTON_LEFT && e.State == sdl.PRESSED {
-			// 				cell_x, cell_y := get_cell(mousePoint)
-			// 				if mouse_over_map {
-			// 					if Elasund.CheckBuild(core.BuildingType_Hotel, cell_x, cell_y, core.PlayerColor_Blue) {
-			// 						Elasund.Build(core.BuildingType_Hotel, cell_x, cell_y, core.PlayerColor_Blue)
-			// 					}
-			// 				}
-			// }
-			// 			if e.Button == sdl.BUTTON_RIGHT && e.State == sdl.PRESSED {
-			// 				cell_x, cell_y := get_cell(mousePoint)
-			// 				if mouse_over_map {
-			// 					if Elasund.CheckBuild(core.BuildingType_Fair, cell_x, cell_y, core.PlayerColor_Blue) {
-			// 						Elasund.Build(core.BuildingType_Fair, cell_x, cell_y, core.PlayerColor_Blue)
-			// 					}
-			// 				}
-			// 			}
+			case *sdl.MouseButtonEvent:
+				switch e.Button {
+				case sdl.BUTTON_LEFT:
+					switch e.State {
+					case sdl.PRESSED:
+						mousePoint.LMouseState = Pressed
+						stages.Update(mousePoint)
+					case sdl.RELEASED:
+						mousePoint.LMouseState = Released
+						stages.Update(mousePoint)
+						mousePoint.LMouseState = NoneMouseState
+					}
+				}
 			case *sdl.MouseMotionEvent:
 				mousePoint.X = e.X
 				mousePoint.Y = e.Y
+				stages.Update(mousePoint)
 			case *sdl.KeyboardEvent:
 				switch e.Keysym.Sym {
 				case sdl.K_ESCAPE, sdl.K_q:
 					isRunning = false
 				case sdl.K_1:
-					stages.SetActive(StageNameMainMenu)
+					stages.Next(StageNameMainMenu)
 				case sdl.K_2:
-					stages.SetActive("2")
+					stages.Next("2")
 				case sdl.K_3:
-					stages.SetActive("3")
+					stages.Next("3")
 				}
 			}
 		} // events

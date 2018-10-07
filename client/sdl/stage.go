@@ -1,7 +1,10 @@
 package sdl
 
-// Stage of game
-type Stage func()
+// Stager of game
+type Stager interface {
+	Updater
+	Drawer
+}
 
 // StageName of game
 type StageName string
@@ -15,14 +18,19 @@ const (
 
 // Stages - allow to change game stages
 type Stages struct {
-	active Stage
-	m      map[StageName]Stage
+	active Stager
+	m      map[StageName]Stager
+}
+
+// StageManager - control active stage
+type StageManager interface {
+	Next(name StageName)
 }
 
 // Add stage
-func (s *Stages) Add(name StageName, stage Stage) {
+func (s *Stages) Add(name StageName, stage Stager) {
 	if s.m == nil {
-		s.m = make(map[StageName]Stage)
+		s.m = make(map[StageName]Stager)
 	}
 	if s.active == nil {
 		s.active = stage
@@ -30,15 +38,20 @@ func (s *Stages) Add(name StageName, stage Stage) {
 	s.m[name] = stage
 }
 
-// SetActive - change active stage
-func (s *Stages) SetActive(name StageName) {
+// Next - change active stage
+func (s *Stages) Next(name StageName) {
 	next := s.m[name]
 	if next != nil {
 		s.active = next
 	}
 }
 
-// Run active stage
-func (s *Stages) Run() {
-	s.active()
+// Update active stage
+func (s *Stages) Update(e Eventer) {
+	s.active.Update(e)
+}
+
+// Draw active stage
+func (s *Stages) Draw(draw *Draw) {
+	s.active.Draw(draw)
 }

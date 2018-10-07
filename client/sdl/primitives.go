@@ -1,5 +1,7 @@
 package sdl
 
+import "github.com/veandco/go-sdl2/sdl"
+
 // Primitiver - interface of game primitives
 type Primitiver interface {
 	Top() int32
@@ -53,6 +55,11 @@ func (p Point) Bottom() int32 {
 	return p.Y
 }
 
+// Move - move point
+func (p Point) Move(x, y int32) Point {
+	return Point{X: p.X + x, Y: p.Y + y}
+}
+
 // Rect - game rectange
 type Rect struct {
 	X, Y, W, H int32
@@ -79,4 +86,22 @@ func (r Rect) Top() int32 {
 // Bottom border of rectangle
 func (r Rect) Bottom() int32 {
 	return r.Y + r.H
+}
+
+// Center - return center of rectangle
+func (r Rect) Center() Point {
+	return Point{
+		X: r.X + int32(r.W/2),
+		Y: r.Y + int32(r.H/2),
+	}
+}
+
+// SDLRect - return sdl rectangle
+func (r Rect) SDLRect() *sdl.Rect {
+	return &sdl.Rect{
+		X: r.X,
+		Y: r.Y,
+		W: r.W,
+		H: r.H,
+	}
 }
