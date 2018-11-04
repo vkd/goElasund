@@ -53,7 +53,7 @@ func Run() error {
 
 	draw := &Draw{renderer: renderer}
 
-	// var update Update
+	var isRunning = true
 
 	var stages Stages
 	stages.Add(StageNameMainMenu, NewMainMenuStage(&stages))
@@ -62,6 +62,9 @@ func Run() error {
 	}))
 	stages.Add("3", DrawOnlyStage(func(draw *Draw) {
 		draw.Clear(purple)
+	}))
+	stages.Add(StageNameQuit, InitOnlyStage(func() {
+		isRunning = false
 	}))
 
 	// t := tm.TextureManager{}
@@ -76,9 +79,8 @@ func Run() error {
 	// count_players := 4
 	// Elasund.Initialize(count_players)
 
-	var event sdl.Event
-	var isRunning = true
-	var fpsLastTime time.Time
+	// var fpsLastTime time.Time
+	var fps = &FPS{lasttime: time.Now()}
 
 	var mousePoint = &MouseEvent{}
 	// update.Mouse = &mousePoint
@@ -86,20 +88,8 @@ func Run() error {
 
 	// var events = make(chan *Event, 1000)
 
+	var event sdl.Event
 	for _ = range time.Tick(deltaTimeFPS) {
-		renderer.SetDrawColor(100, 10, 100, 255)
-		renderer.Clear()
-
-		stages.Draw(draw)
-
-		// 	t.Common[tm.Common_Board].Draw(0, 0)
-
-		ns := time.Since(fpsLastTime).Nanoseconds()
-		currentFPS := int(int64(time.Second) / ns)
-		fpsLastTime = time.Now()
-
-		// draw_text("FPS: "+strconv.Itoa(int(currentFPS)), &point.Point{25, 5}, WHITE, 16)
-		draw.Text("FPS: "+strconv.Itoa(currentFPS), Point{X: 25, Y: 5}, white, 16)
 
 		for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch e := event.(type) {
@@ -129,7 +119,7 @@ func Run() error {
 				case sdl.K_1:
 					stages.Next(StageNameMainMenu)
 				case sdl.K_2:
-					stages.Next("2")
+					stages.Next(StageNameIncome)
 				case sdl.K_3:
 					stages.Next("3")
 				}
@@ -184,6 +174,10 @@ func Run() error {
 		// 	if mouse_over_map {
 		// 		t.Buildings[core.BuildingType_Fair].DrawPoint(get_point(get_cell(mouse_point)))
 		// 	}
+
+		stages.Draw(draw)
+
+		draw.Text("FPS: "+strconv.Itoa(fps.Tick()), Point{X: 25, Y: 5}, white, 16)
 
 		if err = draw.Error(); err != nil {
 			return err
